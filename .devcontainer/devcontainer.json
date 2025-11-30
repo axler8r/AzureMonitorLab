@@ -1,0 +1,48 @@
+{
+    "name": "Azure Monitor Lab",
+    "image": "mcr.microsoft.com/devcontainers/base:2-ubuntu-24.04",
+    "runArgs": [
+        "--name", "azumonlab",
+        "--hostname", "azumonlab.local",
+        "--cpus", "2",
+        "--memory", "8g"
+    ],
+    "features": {
+        "ghcr.io/devcontainers/features/azure-cli:1": {
+            "installBicep": "true"
+        },
+        "ghcr.io/devcontainers/features/powershell:1": {
+            "version": "7.4"
+        },
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.11",
+            "installTools": "true"
+        },
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": "true",
+            "configureZshAsDefaultShell": "true"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "GitHub.copilot",
+                "donjayamanne.kusto",
+                "humao.rest-client",
+                "ms-azuretools.azure-dev",
+                "ms-azuretools.vscode-apimanagement",
+                "ms-azuretools.vscode-azure-github-copilot",
+                "ms-azuretools.vscode-azurecli",
+                "ms-azuretools.vscode-azurefunctions",
+                "ms-azuretools.vscode-azureresourcegroups",
+                "ms-azuretools.vscode-azurestorage",
+                "ms-azuretools.vscode-bicep",
+                "ms-azuretools.vscode-logicapps",
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-vscode.powershell",
+                "redhat.vscode-yaml"
+            ]
+        }
+    }
+}
