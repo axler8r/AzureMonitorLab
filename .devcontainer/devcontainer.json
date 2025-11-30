@@ -8,6 +8,12 @@
         "--memory", "8g"
     ],
     "features": {
+        "ghcr.io/devcontainers-extra/features/apt-packages:1": {
+            "packages": [
+                "git-flow",
+                "tig"
+            ]
+        },
         "ghcr.io/devcontainers/features/azure-cli:1": {
             "installBicep": "true"
         },
