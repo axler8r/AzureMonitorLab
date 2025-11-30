@@ -76,3 +76,6 @@ logs/
 
 # Azure CLI
 .azure/
+
+# User-specific files
+!doc/

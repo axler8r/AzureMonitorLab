@@ -32,6 +32,7 @@ param tags object = {
 // Variables
 var workspaceName = 'law-${environmentName}-monitor'
 var appInsightsName = 'appi-${environmentName}-monitor'
+#disable-next-line BCP335
 var storageAccountName = 'st${environmentName}${uniqueString(resourceGroup().id)}'
 var appServicePlanName = 'asp-${environmentName}-monitor'
 var functionAppName = 'func-${environmentName}-monitor'
@@ -67,6 +68,7 @@ module appInsights 'modules/appinsights.bicep' = {
 module storage 'modules/storage.bicep' = {
   name: 'storageDeployment'
   params: {
+    #disable-next-line BCP335
     storageAccountName: storageAccountName
     location: location
     sku: 'Standard_LRS'

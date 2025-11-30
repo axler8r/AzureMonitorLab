@@ -26,7 +26,12 @@ resource logicApp 'Microsoft.Logic/workflows@2019-05-01' = {
     definition: {
       '$schema': 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
       contentVersion: '1.0.0.0'
-      parameters: {}
+      parameters: {
+        alertEmail: {
+          type: 'string'
+          defaultValue: alertEmailAddress
+        }
+      }
       triggers: {
         manual: {
           type: 'Request'
@@ -53,7 +58,7 @@ resource logicApp 'Microsoft.Logic/workflows@2019-05-01' = {
         }
       }
       actions: {
-        'Response': {
+        Response: {
           type: 'Response'
           kind: 'Http'
           inputs: {
@@ -62,6 +67,7 @@ resource logicApp 'Microsoft.Logic/workflows@2019-05-01' = {
               message: 'Alert received and processed'
               alertName: '@{triggerBody()?[\'alertName\']}'
               receivedAt: '@{utcNow()}'
+              notificationEmail: '@{parameters(\'alertEmail\')}'
             }
           }
           runAfter: {}
