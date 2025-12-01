@@ -6,6 +6,8 @@
 # Bicep
 *.bicep.json
 *.bicepparam.json
+main.json
+deployment-outputs.json
 
 # Python
 __pycache__/
