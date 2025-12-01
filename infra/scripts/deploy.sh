@@ -92,17 +92,20 @@ fi
 echo -e "${GREEN}Deploying infrastructure...${NC}"
 DEPLOYMENT_NAME="monitorlab-$(date +%Y%m%d-%H%M%S)"
 
+# Get publisher email and name from .env or use defaults
+PUBLISHER_EMAIL="${PUBLISHER_EMAIL:-admin@example.com}"
+PUBLISHER_NAME="${PUBLISHER_NAME:-Azure Monitor Lab}"
+
 if [ -n "$PARAM_FILE" ]; then
     DEPLOYMENT_OUTPUT=$(az deployment group create \
         --name "$DEPLOYMENT_NAME" \
         --resource-group "$AZURE_RESOURCE_GROUP" \
         --template-file "$PROJECT_ROOT/infra/bicep/main.bicep" \
         --parameters "$PARAM_FILE" \
-        --parameters environmentName="$ENVIRONMENT_NAME" \
+        --parameters publisherEmail="$PUBLISHER_EMAIL" \
+        --parameters publisherName="$PUBLISHER_NAME" \
         --output json)
 else
-    # Get publisher email from .env or use default
-    PUBLISHER_EMAIL="${PUBLISHER_EMAIL:-admin@example.com}"
     
     DEPLOYMENT_OUTPUT=$(az deployment group create \
         --name "$DEPLOYMENT_NAME" \

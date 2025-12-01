@@ -30,15 +30,17 @@ param tags object = {
 }
 
 // Variables
-var workspaceName = 'law-${environmentName}-monitor'
-var appInsightsName = 'appi-${environmentName}-monitor'
+// Extract environment suffix (dev/prod) from environmentName (devlab/prodlab)
+var envSuffix = endsWith(environmentName, 'lab') ? substring(environmentName, 0, length(environmentName) - 3) : environmentName
+var workspaceName = 'law-azmonlab-${envSuffix}'
+var appInsightsName = 'appi-azmonlab-${envSuffix}'
 #disable-next-line BCP335
-var storageAccountName = 'st${environmentName}${uniqueString(resourceGroup().id)}'
-var appServicePlanName = 'asp-${environmentName}-monitor'
-var functionAppName = 'func-${environmentName}-monitor'
-var serviceBusNamespaceName = 'sb-${environmentName}-monitor'
-var logicAppName = 'logic-${environmentName}-alert'
-var apimName = 'apim-${environmentName}-monitor'
+var storageAccountName = 'stazmon${envSuffix}${substring(uniqueString(resourceGroup().id), 0, 8)}'
+var appServicePlanName = 'asp-azmonlab-${envSuffix}'
+var functionAppName = 'func-azmonlab-${envSuffix}'
+var serviceBusNamespaceName = 'sb-azmonlab-${envSuffix}'
+var logicAppName = 'logic-azmonlab-${envSuffix}'
+var apimName = 'apim-azmonlab-${envSuffix}'
 
 // Log Analytics Workspace Module
 module logAnalytics 'modules/loganalytics.bicep' = {
@@ -111,7 +113,7 @@ module functionApp 'modules/function.bicep' = {
     functionAppName: functionAppName
     location: location
     appServicePlanId: appServicePlan.id
-    storageAccountName: storage.outputs.storageAccountName
+    storageAccountId: storage.outputs.storageAccountId
     appInsightsConnectionString: appInsights.outputs.connectionString
     appInsightsInstrumentationKey: appInsights.outputs.instrumentationKey
     logAnalyticsWorkspaceId: logAnalytics.outputs.workspaceId
@@ -138,7 +140,7 @@ module apiManagement 'modules/apim.bicep' = {
   params: {
     apimName: apimName
     location: location
-    sku: 'Consumption'
+    sku: 'Developer'
     publisherEmail: publisherEmail
     publisherName: publisherName
     appInsightsId: appInsights.outputs.appInsightsId

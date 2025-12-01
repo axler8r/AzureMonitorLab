@@ -135,9 +135,8 @@ try {
         --resource-group $ResourceGroup `
         --template-file (Join-Path $ProjectRoot "infra/bicep/main.bicep") `
         $(if ($ParamFile) { "--parameters `"$ParamFile`"" }) `
-        --parameters environmentName=$EnvironmentName `
-        --parameters location=$Location `
         --parameters publisherEmail=$PublisherEmail `
+        --parameters publisherName=$PublisherName `
         --parameters logAnalyticsRetentionDays=$RetentionDays `
         --output json | ConvertFrom-Json
 
