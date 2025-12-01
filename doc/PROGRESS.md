@@ -17,11 +17,11 @@
 - [x] **Bicep Modules** - All resources with diagnostic settings → Log Analytics:
   - `loganalytics.bicep` - Workspace with configurable SKU and retention (30-730 days)
   - `appinsights.bicep` - Application Insights linked to Log Analytics workspace
-  - `storage.bicep` - Storage Account with blob/queue/table diagnostic settings
-  - `function.bicep` - Python 3.11 Function App with App Insights integration
+  - `storage.bicep` - Storage Account with blob/queue/table/file diagnostic settings
+  - `function.bicep` - Python 3.11 Function App with App Insights integration (Linux Consumption)
   - `servicebus.bicep` - Service Bus namespace with queue and topic
   - `logicapp.bicep` - Logic App for alert handling workflows
-  - `apim.bicep` - API Management (Consumption) with App Insights logger
+  - `apim.bicep` - API Management (Developer) with App Insights logger
 - [x] **Main Template** - `main.bicep` orchestration with:
   - App Service Plan (Consumption Y1 for Functions)
   - Resource naming with environment prefix
@@ -130,8 +130,9 @@ None currently.
 
 ## Technical Debt & Known Issues
 
-- [ ] Storage Account naming may fail if environment name + unique suffix > 24 chars
-- [ ] Parameter files contain placeholder email addresses (should be documented in setup)
+- [x] ~~Storage Account naming may fail if environment name + unique suffix > 24 chars~~ - Fixed: Limited to 18 chars total (stazmon + env + 8 unique chars)
+- [x] ~~Parameter files contain placeholder email addresses~~ - Fixed: Publisher info now sourced from .env file
+- [x] ~~Function App file share creation caused 403 errors~~ - Fixed: Removed WEBSITE_CONTENTAZUREFILECONNECTIONSTRING/WEBSITE_CONTENTSHARE, let Function App auto-create
 - [ ] No validation script to verify Bicep before deployment
 - [ ] Deployment scripts lack retry logic for transient failures
 
@@ -148,11 +149,11 @@ None currently.
 ## Metrics
 
 - **Requirements Coverage**: 100% (REQ-001 through REQ-010 addressed)
-- **Infrastructure Completion**: 100% (7/7 Bicep modules)
+- **Infrastructure Completion**: 100% (7/7 Bicep modules + deployment scripts)
 - **Application Completion**: 0% (0/2 components)
 - **Queries & Alerts**: 0% (0/10 files)
-- **Documentation**: 20% (2/10 files)
-- **Overall Progress**: ~40%
+- **Documentation**: 30% (3/10 files - REQUIREMENTS, ARCHITECTURE, PROGRESS)
+- **Overall Progress**: ~45%
 
 ## Next Steps
 
@@ -166,4 +167,4 @@ None currently.
 8. Delete this file and ship v1.0!
 
 ---
-*Last Updated*: 2025-11-30
+*Last Updated*: 2025-12-01

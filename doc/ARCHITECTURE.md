@@ -125,12 +125,19 @@ AzureMonitorLab/
 - **Type**: StorageV2 (General Purpose v2)
 - **SKU**: Standard_LRS
 - **Access Tier**: Hot
-- **Services**: Blob, Queue, Table
-- **Diagnostics**: All services send logs to Log Analytics
+- **Services**: Blob, Queue, Table, File
+- **Diagnostics**: All services (blob, queue, table, file) send logs to Log Analytics
 - **Security**: 
   - HTTPS only
   - TLS 1.2 minimum
   - Public blob access disabled
+  - Public network access enabled (required for Function App file share access)
+  - Shared key access enabled (Function App uses connection strings)
+- **Function App Integration**:
+  - File service explicitly created for Function App content storage
+  - Network ACLs allow Azure Services bypass
+  - Function App accesses storage via `AzureWebJobsStorage` connection string
+  - Content file share created automatically by Function App (not pre-provisioned)
 
 #### Service Bus
 - **Tier**: Standard
@@ -214,16 +221,19 @@ AzureMonitorLab/
 **Future enhancement**: Add optional managed identity configuration
 
 ### 7. Resource Naming Convention
-**Decision**: Azure naming conventions with environment prefix
+**Decision**: Azure naming conventions with consistent project identifier
 
 **Pattern**:
 ```
-{resource-type}-{environment}-{purpose}
-law-devlab-monitor        # Log Analytics Workspace
-appi-devlab-monitor       # Application Insights
-func-devlab-monitor       # Function App
-sb-devlab-monitor         # Service Bus
-st{env}{unique}           # Storage (max 24 chars, no hyphens)
+{resource-type}-azmonlab-{environment}
+law-azmonlab-dev          # Log Analytics Workspace
+appi-azmonlab-dev         # Application Insights
+func-azmonlab-dev         # Function App
+sb-azmonlab-dev           # Service Bus
+apim-azmonlab-dev         # API Management
+logic-azmonlab-dev        # Logic App
+asp-azmonlab-dev          # App Service Plan
+stazmon{env}{unique8}     # Storage (18 chars total, no hyphens)
 ```
 
 **Rationale**:

@@ -1,7 +1,7 @@
 # Azure Monitor Lab - Requirements
 
 ## Requirements
-- The lab will focus on Log Analytics, and Application Insights.
+- The lab will **focus** on _Log Analytics_, and _Application Insights_.
 - Participants must be able to complete the labs with 6 hours of hands-on time.
 - Participants will not be required to wrtie more than a few lines of code.
 - The lab will be self-contained, with all resources created and destroyed via scripts.
