@@ -35,6 +35,7 @@
                 "GitHub.copilot",
                 "donjayamanne.kusto",
                 "humao.rest-client",
+                "bierner.markdown-mermaid",
                 "ms-azuretools.azure-dev",
                 "ms-azuretools.vscode-apimanagement",
                 "ms-azuretools.vscode-azure-github-copilot",
