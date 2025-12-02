@@ -51,6 +51,29 @@ None currently.
 ### Phase 3: Application (REQ-003)
 **Priority**: High | **Effort**: Medium
 
+- [x] **Logic App Telemetry Generator** (timer-triggered Service Bus message sender):
+  - [x] Add `LOGIC_APP_RECURRENCE_INTERVAL` to `.env.example` (default: 30 seconds)
+  - [x] Update `logicapp.bicep` - Add parameters for Service Bus connection and recurrence interval
+  - [x] Replace HTTP webhook trigger with Recurrence trigger (configurable interval, default 30s)
+  - [x] Add Service Bus send message action to `lab-queue`
+  - [x] Create varied message payloads (event types, severity levels, timestamps)
+  - [x] Include error scenarios (20% error rate with Warning/Error severities for monitoring demo)
+  - [x] Update `main.bicep` - Pass Service Bus connection string, queue name, and interval to Logic App module
+  - [x] Create interactive lab guide (`02-logic-app-data-collection.md`) with hands-on exercises
+  - [x] Validate Bicep templates - All syntax checks pass, what-if analysis successful
+  - [x] Add Service Bus API connection with connection string authentication
+  - [x] Document manual authorization requirement for V1 API connections in lab guide
+  - [x] Add deployment outputs for connection name and authorization instructions
+  - [x] Test and validate: V2 managed identity connections not feasible (requires complex setup)
+  - [x] Confirmed: V1 connections require one-time Portal authorization (Azure platform limitation)
+
+- [ ] **Deploy and validate Logic App telemetry generation**:
+  - [ ] Run deployment with updated Bicep templates
+  - [ ] Perform one-time authorization of Service Bus API connection in Portal
+  - [ ] Verify Logic App runs succeed every 30 seconds
+  - [ ] Confirm messages appear in Service Bus queue
+  - [ ] Validate workflow execution logs in Log Analytics
+
 - [ ] **Python Function App** implementation in `src/function-app/`:
   - [ ] `function_app.py` - Main application entry point with Application Insights SDK
   - [ ] HTTP trigger function - RESTful endpoint for health checks and demo requests
@@ -67,6 +90,8 @@ None currently.
   - [ ] `requirements.txt` - Dependencies (requests, etc.)
 
 **Acceptance Criteria**:
+- Logic App runs on schedule and sends messages to Service Bus queue
+- Workflow execution logs appear in Log Analytics
 - Functions deploy successfully to Azure
 - Application Insights receives telemetry automatically
 - Load generator creates realistic traffic patterns
@@ -133,8 +158,15 @@ None currently.
 - [x] ~~Storage Account naming may fail if environment name + unique suffix > 24 chars~~ - Fixed: Limited to 18 chars total (stazmon + env + 8 unique chars)
 - [x] ~~Parameter files contain placeholder email addresses~~ - Fixed: Publisher info now sourced from .env file
 - [x] ~~Function App file share creation caused 403 errors~~ - Fixed: Removed WEBSITE_CONTENTAZUREFILECONNECTIONSTRING/WEBSITE_CONTENTSHARE, let Function App auto-create
+- [x] ~~Logic App Service Bus API connection 401 Unauthorized errors~~ - Resolved: V1 connections require one-time manual Portal authorization (Azure platform limitation, not a bug)
 - [ ] No validation script to verify Bicep before deployment
 - [ ] Deployment scripts lack retry logic for transient failures
+- [ ] Logic App Service Bus connection requires manual authorization step after deployment (documented in lab guide)
+
+**Notes on Logic App Authorization**:
+- V1 API connections (connection string-based) cannot be fully automated via Bicep
+- V2 API connections (managed identity-based) support access policies but require more complex setup
+- Workshop uses V1 for simplicity with one-time Portal authorization documented in Lab 02
 
 ## Future Enhancements (Post-v1.0)
 
@@ -150,14 +182,20 @@ None currently.
 
 - **Requirements Coverage**: 100% (REQ-001 through REQ-010 addressed)
 - **Infrastructure Completion**: 100% (7/7 Bicep modules + deployment scripts)
-- **Application Completion**: 0% (0/2 components)
+- **Application Completion**: 33% (1/3 components - Logic App telemetry generator complete)
 - **Queries & Alerts**: 0% (0/10 files)
-- **Documentation**: 30% (3/10 files - REQUIREMENTS, ARCHITECTURE, PROGRESS)
-- **Overall Progress**: ~45%
+- **Documentation**: 40% (4/10 files - REQUIREMENTS, ARCHITECTURE, PROGRESS, Lab 02)
+- **Overall Progress**: ~55%
 
 ## Next Steps
 
-1. Implement Python Function App with three trigger types
+1. ~~Implement Python Function App with three trigger types~~ **→ Deploy and validate Logic App first**
+2. **Deploy updated infrastructure** with Logic App telemetry generator
+3. **Authorize Service Bus API connection** in Azure Portal (one-time step)
+4. **Validate Logic App operation**: Verify workflow runs every 30s and messages reach Service Bus queue
+5. Create load generator for realistic traffic patterns
+6. Write basic KQL queries for log analysis (Lab 03)
+7. Implement Python Function App with HTTP/ServiceBus/Timer triggers
 2. Create load generator for traffic simulation
 3. Write basic and advanced KQL queries
 4. Build workbook template and alert definitions

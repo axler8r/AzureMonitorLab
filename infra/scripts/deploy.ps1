@@ -38,7 +38,9 @@ $Location = $env:AZURE_LOCATION
 $EnvironmentName = $env:ENVIRONMENT_NAME
 $CreateResourceGroup = $env:CREATE_RESOURCE_GROUP -eq "true"
 $PublisherEmail = if ($env:PUBLISHER_EMAIL) { $env:PUBLISHER_EMAIL } else { "admin@example.com" }
+$PublisherName = if ($env:PUBLISHER_NAME) { $env:PUBLISHER_NAME } else { "Azure Monitor Lab" }
 $RetentionDays = if ($env:LOG_ANALYTICS_RETENTION_DAYS) { [int]$env:LOG_ANALYTICS_RETENTION_DAYS } else { 30 }
+$RecurrenceInterval = if ($env:LOGIC_APP_RECURRENCE_INTERVAL) { [int]$env:LOGIC_APP_RECURRENCE_INTERVAL } else { 30 }
 
 # Validate required variables
 if (-not $SubscriptionId -or -not $ResourceGroup -or -not $Location -or -not $EnvironmentName) {
@@ -138,6 +140,7 @@ try {
         --parameters publisherEmail=$PublisherEmail `
         --parameters publisherName=$PublisherName `
         --parameters logAnalyticsRetentionDays=$RetentionDays `
+        --parameters recurrenceIntervalSeconds=$RecurrenceInterval `
         --output json | ConvertFrom-Json
 
     Write-Host "✓ Deployment successful!" -ForegroundColor Green

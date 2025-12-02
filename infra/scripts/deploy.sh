@@ -95,6 +95,7 @@ DEPLOYMENT_NAME="monitorlab-$(date +%Y%m%d-%H%M%S)"
 # Get publisher email and name from .env or use defaults
 PUBLISHER_EMAIL="${PUBLISHER_EMAIL:-admin@example.com}"
 PUBLISHER_NAME="${PUBLISHER_NAME:-Azure Monitor Lab}"
+RECURRENCE_INTERVAL="${LOGIC_APP_RECURRENCE_INTERVAL:-30}"
 
 if [ -n "$PARAM_FILE" ]; then
     DEPLOYMENT_OUTPUT=$(az deployment group create \
@@ -104,6 +105,7 @@ if [ -n "$PARAM_FILE" ]; then
         --parameters "$PARAM_FILE" \
         --parameters publisherEmail="$PUBLISHER_EMAIL" \
         --parameters publisherName="$PUBLISHER_NAME" \
+        --parameters recurrenceIntervalSeconds="$RECURRENCE_INTERVAL" \
         --output json)
 else
     
@@ -114,7 +116,9 @@ else
         --parameters environmentName="$ENVIRONMENT_NAME" \
         --parameters location="$AZURE_LOCATION" \
         --parameters publisherEmail="$PUBLISHER_EMAIL" \
+        --parameters publisherName="$PUBLISHER_NAME" \
         --parameters logAnalyticsRetentionDays="${LOG_ANALYTICS_RETENTION_DAYS:-30}" \
+        --parameters recurrenceIntervalSeconds="$RECURRENCE_INTERVAL" \
         --output json)
 fi
 

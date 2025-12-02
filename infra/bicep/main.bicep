@@ -22,6 +22,11 @@ param publisherEmail string
 @description('Publisher organization name for API Management')
 param publisherName string = 'Azure Monitor Lab'
 
+@description('Logic App recurrence interval in seconds for telemetry generation')
+@minValue(10)
+@maxValue(3600)
+param recurrenceIntervalSeconds int = 30
+
 @description('Tags to apply to all resources')
 param tags object = {
   Environment: environmentName
@@ -129,7 +134,9 @@ module logicApp 'modules/logicapp.bicep' = {
     logicAppName: logicAppName
     location: location
     logAnalyticsWorkspaceId: logAnalytics.outputs.workspaceId
-    alertEmailAddress: publisherEmail
+    serviceBusConnectionString: serviceBus.outputs.serviceBusConnectionString
+    serviceBusQueueName: serviceBus.outputs.queueName
+    recurrenceIntervalSeconds: recurrenceIntervalSeconds
     tags: tags
   }
 }
@@ -208,8 +215,11 @@ output logicAppId string = logicApp.outputs.logicAppId
 @description('Logic App Name')
 output logicAppName string = logicApp.outputs.logicAppName
 
-@description('Logic App Callback URL')
-output logicAppCallbackUrl string = logicApp.outputs.logicAppCallbackUrl
+@description('Service Bus connection name that needs authorization')
+output serviceBusConnectionName string = logicApp.outputs.serviceBusConnectionName
+
+@description('Authorization instructions for Logic App Service Bus connection')
+output logicAppAuthInstructions string = logicApp.outputs.authorizationNote
 
 @description('API Management Resource ID')
 output apimId string = apiManagement.outputs.apimId
