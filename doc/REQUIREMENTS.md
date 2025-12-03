@@ -13,8 +13,7 @@
   - Log Analytics Workspace
   - Application Insights
   - Azure Storage Account
-  - Azure Logic Apps
-  - Azure Functions
+  - Azure Logic Apps (2 workflows)
   - Azure Service Bus
   - Azure API Management
 - There will be no networking components such as VNets or Firewalls.
@@ -28,9 +27,9 @@
 - Set up custom telemetry collection.
 
 ### REQ-003: Sample Application/Workload
-- Deploy a working application that generates realistic telemetry.
-- Include scenarios that produce errors, performance issues, and normal operations.
-- Application should use Storage, Service Bus, and other lab resources.
+- Participants will build Logic App workflows to generate realistic telemetry.
+- Workflows will interact with Service Bus and APIM to produce logs and metrics.
+- Participants will configure APIM APIs for monitoring demonstrations.
 
 ### REQ-004: KQL Query Scenarios
 - Provide pre-built queries for common monitoring tasks.
