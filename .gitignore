@@ -6,46 +6,8 @@
 # Bicep
 *.bicep.json
 *.bicepparam.json
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-.pytest_cache/
-.coverage
-.coverage.*
-htmlcov/
-.tox/
-.hypothesis/
-*.mo
-*.pot
-
-# Function App
-local.settings.json
-.python_packages/
-.venv/
-.funcignore
+main.json
+deployment-outputs.json
 
 # IDE
 .vscode/*
@@ -79,3 +41,5 @@ logs/
 
 # User-specific files
 !doc/
+infra/bicep/**/*.json
+tmp/

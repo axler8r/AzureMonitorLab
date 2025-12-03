@@ -39,6 +39,8 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
     allowBlobPublicAccess: false
+    publicNetworkAccess: 'Enabled'
+    allowSharedKeyAccess: true
     networkAcls: {
       defaultAction: 'Allow'
       bypass: 'AzureServices'
@@ -60,6 +62,12 @@ resource queueService 'Microsoft.Storage/storageAccounts/queueServices@2023-01-0
 
 // Table Service
 resource tableService 'Microsoft.Storage/storageAccounts/tableServices@2023-01-01' = {
+  parent: storageAccount
+  name: 'default'
+}
+
+// File Service
+resource fileService 'Microsoft.Storage/storageAccounts/fileServices@2023-01-01' = {
   parent: storageAccount
   name: 'default'
 }
@@ -141,6 +149,35 @@ resource queueDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-prev
 resource tableDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
   scope: tableService
   name: 'table-diagnostics'
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      {
+        category: 'StorageRead'
+        enabled: true
+      }
+      {
+        category: 'StorageWrite'
+        enabled: true
+      }
+      {
+        category: 'StorageDelete'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'Transaction'
+        enabled: true
+      }
+    ]
+  }
+}
+
+// Diagnostic Settings for File Service
+resource fileDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  scope: fileService
+  name: 'file-diagnostics'
   properties: {
     workspaceId: logAnalyticsWorkspaceId
     logs: [

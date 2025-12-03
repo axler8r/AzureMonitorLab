@@ -22,6 +22,11 @@ param publisherEmail string
 @description('Publisher organization name for API Management')
 param publisherName string = 'Azure Monitor Lab'
 
+@description('Logic App recurrence interval in seconds for both workflows')
+@minValue(10)
+@maxValue(3600)
+param recurrenceIntervalSeconds int = 60
+
 @description('Tags to apply to all resources')
 param tags object = {
   Environment: environmentName
@@ -30,15 +35,16 @@ param tags object = {
 }
 
 // Variables
-var workspaceName = 'law-${environmentName}-monitor'
-var appInsightsName = 'appi-${environmentName}-monitor'
+// Extract environment suffix (dev/prod) from environmentName (devlab/prodlab)
+var envSuffix = endsWith(environmentName, 'lab') ? substring(environmentName, 0, length(environmentName) - 3) : environmentName
+var workspaceName = 'law-azmonlab-${envSuffix}'
+var appInsightsName = 'appi-azmonlab-${envSuffix}'
 #disable-next-line BCP335
-var storageAccountName = 'st${environmentName}${uniqueString(resourceGroup().id)}'
-var appServicePlanName = 'asp-${environmentName}-monitor'
-var functionAppName = 'func-${environmentName}-monitor'
-var serviceBusNamespaceName = 'sb-${environmentName}-monitor'
-var logicAppName = 'logic-${environmentName}-alert'
-var apimName = 'apim-${environmentName}-monitor'
+var storageAccountName = 'stazmon${envSuffix}${substring(uniqueString(resourceGroup().id), 0, 8)}'
+var serviceBusNamespaceName = 'sb-azmonlab-${envSuffix}'
+var logicAppSBSenderName = 'logic-azmonlab-sbsender'
+var logicAppApiCallerName = 'logic-azmonlab-apicaller'
+var apimName = 'apim-azmonlab-${envSuffix}'
 
 // Log Analytics Workspace Module
 module logAnalytics 'modules/loganalytics.bicep' = {
@@ -89,45 +95,26 @@ module serviceBus 'modules/servicebus.bicep' = {
   }
 }
 
-// App Service Plan for Function App
-resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
-  name: appServicePlanName
-  location: location
-  tags: tags
-  sku: {
-    name: 'Y1'
-    tier: 'Dynamic'
-  }
-  kind: 'linux'
-  properties: {
-    reserved: true
-  }
-}
-
-// Function App Module
-module functionApp 'modules/function.bicep' = {
-  name: 'functionAppDeployment'
+// Logic App - Service Bus Sender
+module logicAppSBSender 'modules/logicapp-sbsender.bicep' = {
+  name: 'logicAppSBSenderDeployment'
   params: {
-    functionAppName: functionAppName
+    logicAppName: logicAppSBSenderName
     location: location
-    appServicePlanId: appServicePlan.id
-    storageAccountName: storage.outputs.storageAccountName
-    appInsightsConnectionString: appInsights.outputs.connectionString
-    appInsightsInstrumentationKey: appInsights.outputs.instrumentationKey
     logAnalyticsWorkspaceId: logAnalytics.outputs.workspaceId
-    serviceBusConnectionString: serviceBus.outputs.serviceBusConnectionString
+    recurrenceIntervalSeconds: recurrenceIntervalSeconds
     tags: tags
   }
 }
 
-// Logic App Module
-module logicApp 'modules/logicapp.bicep' = {
-  name: 'logicAppDeployment'
+// Logic App - API Caller
+module logicAppApiCaller 'modules/logicapp-apicaller.bicep' = {
+  name: 'logicAppApiCallerDeployment'
   params: {
-    logicAppName: logicAppName
+    logicAppName: logicAppApiCallerName
     location: location
     logAnalyticsWorkspaceId: logAnalytics.outputs.workspaceId
-    alertEmailAddress: publisherEmail
+    recurrenceIntervalSeconds: recurrenceIntervalSeconds
     tags: tags
   }
 }
@@ -138,7 +125,7 @@ module apiManagement 'modules/apim.bicep' = {
   params: {
     apimName: apimName
     location: location
-    sku: 'Consumption'
+    sku: 'Developer'
     publisherEmail: publisherEmail
     publisherName: publisherName
     appInsightsId: appInsights.outputs.appInsightsId
@@ -179,15 +166,6 @@ output storageAccountName string = storage.outputs.storageAccountName
 @description('Storage Account Connection String')
 output storageConnectionString string = storage.outputs.storageConnectionString
 
-@description('Function App Resource ID')
-output functionAppId string = functionApp.outputs.functionAppId
-
-@description('Function App Name')
-output functionAppName string = functionApp.outputs.functionAppName
-
-@description('Function App Hostname')
-output functionAppHostName string = functionApp.outputs.functionAppHostName
-
 @description('Service Bus Namespace ID')
 output serviceBusId string = serviceBus.outputs.serviceBusId
 
@@ -200,14 +178,20 @@ output serviceBusConnectionString string = serviceBus.outputs.serviceBusConnecti
 @description('Service Bus Queue Name')
 output serviceBusQueueName string = serviceBus.outputs.queueName
 
-@description('Logic App Resource ID')
-output logicAppId string = logicApp.outputs.logicAppId
+@description('Service Bus Topic Name')
+output serviceBusTopicName string = serviceBus.outputs.topicName
 
-@description('Logic App Name')
-output logicAppName string = logicApp.outputs.logicAppName
+@description('Logic App Service Bus Sender Resource ID')
+output logicAppSBSenderId string = logicAppSBSender.outputs.logicAppId
 
-@description('Logic App Callback URL')
-output logicAppCallbackUrl string = logicApp.outputs.logicAppCallbackUrl
+@description('Logic App Service Bus Sender Name')
+output logicAppSBSenderName string = logicAppSBSender.outputs.logicAppName
+
+@description('Logic App API Caller Resource ID')
+output logicAppApiCallerId string = logicAppApiCaller.outputs.logicAppId
+
+@description('Logic App API Caller Name')
+output logicAppApiCallerName string = logicAppApiCaller.outputs.logicAppName
 
 @description('API Management Resource ID')
 output apimId string = apiManagement.outputs.apimId

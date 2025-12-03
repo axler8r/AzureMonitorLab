@@ -2,7 +2,12 @@ using '../main.bicep'
 
 // Development environment parameters
 param environmentName = 'devlab'
-param location = 'eastus'
+param location = 'australiaeast'
 param logAnalyticsRetentionDays = 30
-param publisherEmail = 'your-email@example.com'
-param publisherName = 'Azure Monitor Lab - Dev'
+
+// Publisher info - overridden by .env values during deployment
+param publisherEmail = 'placeholder@example.com'
+param publisherName = 'Placeholder'
+
+// Logic App recurrence interval (60 seconds default for both workflows)
+param recurrenceIntervalSeconds = 60

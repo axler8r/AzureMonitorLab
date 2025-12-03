@@ -14,7 +14,7 @@ AzureMonitorLab/
 │   ├── PROGRESS.md                # Implementation tracking
 │   ├── lab-guide/                 # Step-by-step exercises
 │   │   ├── 01-setup.md
-│   │   ├── 02-data-collection.md
+│   │   ├── 02-logic-apps.md
 │   │   ├── 03-kql-queries.md
 │   │   ├── 04-app-insights.md
 │   │   ├── 05-alerting.md
@@ -28,9 +28,9 @@ AzureMonitorLab/
 │   │   │   ├── loganalytics.bicep
 │   │   │   ├── appinsights.bicep
 │   │   │   ├── storage.bicep
-│   │   │   ├── function.bicep
 │   │   │   ├── servicebus.bicep
-│   │   │   ├── logicapp.bicep
+│   │   │   ├── logicapp-sbsender.bicep
+│   │   │   ├── logicapp-apicaller.bicep
 │   │   │   └── apim.bicep
 │   │   └── parameters/            # Environment-specific parameters
 │   │       ├── dev.bicepparam
@@ -40,19 +40,6 @@ AzureMonitorLab/
 │       ├── deploy.ps1             # PowerShell deployment
 │       ├── cleanup.sh             # Bash cleanup
 │       └── cleanup.ps1            # PowerShell cleanup
-├── src/
-│   ├── function-app/              # Python Function App
-│   │   ├── function_app.py        # Function app entry point
-│   │   ├── host.json              # Function app configuration
-│   │   ├── local.settings.json    # Local development settings
-│   │   ├── requirements.txt       # Python dependencies
-│   │   └── functions/             # Function implementations
-│   │       ├── http_trigger/
-│   │       ├── servicebus_trigger/
-│   │       └── timer_trigger/
-│   └── load-generator/            # Traffic generation tool
-│       ├── generate_load.py
-│       └── requirements.txt
 ├── queries/
 │   ├── basic/                     # Basic KQL queries
 │   │   ├── 01-service-health.kql
@@ -99,25 +86,29 @@ AzureMonitorLab/
 
 ### Compute & Application Services
 
-#### Azure Functions
-- **Runtime**: Python 3.11
-- **Hosting**: Linux Consumption Plan (Y1)
-- **Triggers**: HTTP, Service Bus, Timer
-- **Integration**: Application Insights SDK for telemetry
-- **Purpose**: Generate realistic application telemetry and demonstrate monitoring
+#### Logic Apps (2 workflows)
+**Type**: Consumption-based workflows
+**Purpose**: 
+- `logic-azmonlab-sbsender`: Participants build workflow to send messages to Service Bus
+- `logic-azmonlab-apicaller`: Participants build workflow to call APIM APIs
+**Pre-configured**: Empty Recurrence triggers with configurable intervals (60s default)
+**Integration**: Diagnostic logs sent to Log Analytics
+**Learning outcomes**: 
+- Build Logic App workflows from scratch
+- Configure Service Bus and HTTP connectors
+- Monitor workflow execution and performance
 
 #### API Management
-- **Tier**: Consumption (serverless, cost-effective)
-- **Features**:
-  - Integrated with Application Insights
+**Tier**: Developer
+**Features**:
+  - Base APIM instance with Application Insights logger
   - Gateway logs to Log Analytics
-  - API request/response logging
-- **Purpose**: Demonstrate API monitoring and analytics
-
-#### Logic Apps
-- **Type**: Consumption-based workflows
-- **Purpose**: Alert response automation and incident handling
-- **Integration**: Triggered by Azure Monitor alerts
+  - No pre-configured APIs (participants create them)
+**Purpose**: Demonstrate API monitoring, logging, and analytics
+**Learning outcomes**:
+- Create and configure APIs in APIM
+- Understand API request/response logging
+- Monitor API performance and usage
 
 ### Data Services
 
@@ -125,12 +116,14 @@ AzureMonitorLab/
 - **Type**: StorageV2 (General Purpose v2)
 - **SKU**: Standard_LRS
 - **Access Tier**: Hot
-- **Services**: Blob, Queue, Table
+- **Services**: Blob, Queue, Table, File
 - **Diagnostics**: All services send logs to Log Analytics
 - **Security**: 
   - HTTPS only
   - TLS 1.2 minimum
   - Public blob access disabled
+  - Public network access enabled
+- **Purpose**: Demonstrate storage monitoring and diagnostic logs
 
 #### Service Bus
 - **Tier**: Standard
@@ -154,26 +147,26 @@ AzureMonitorLab/
 **Implementation**: `CREATE_RESOURCE_GROUP=true/false` in `.env`
 
 ### 2. API Management Tier
-**Decision**: Consumption tier
+**Decision**: Developer tier
 
 **Rationale**:
-- Cost-effective for lab scenarios (~$0.035 per 10K calls)
-- No upfront commitment or idle costs
-- Sufficient features for monitoring demonstrations
-- Easy to deploy and tear down
+- Full feature set for learning and demonstrations
+- Developer portal access for API documentation
+- Advanced logging and diagnostics capabilities
+- Suitable for non-production lab environments
 
-**Trade-offs**: Limited advanced features, but adequate for lab purposes
+**Trade-offs**: Higher cost (~$50/month) vs Consumption, but better learning experience
 
-### 3. Function App Hosting
-**Decision**: Linux Consumption Plan (Y1)
+### 3. Logic Apps Approach
+**Decision**: Two separate Logic Apps with minimal pre-configuration
 
 **Rationale**:
-- Serverless pricing (pay per execution)
-- Native Python support on Linux
-- Fast cold start times for demos
-- Scales automatically for load testing
+- Participants build workflows from scratch (hands-on learning)
+- No code deployment required
+- Visual workflow designer accessible to beginners
+- Automatic integration with Azure services
 
-**Configuration**: Python 3.11 runtime for latest features and security
+**Configuration**: Empty Recurrence triggers, participants add actions
 
 ### 4. Service Bus Tier
 **Decision**: Standard tier
@@ -202,28 +195,33 @@ AzureMonitorLab/
 
 ### 6. Authentication & Security
 **Decision**: 
-- Connection strings for initial setup
+- Managed identities for Logic Apps (system-assigned)
 - TLS 1.2 minimum enforcement
 - HTTPS-only traffic
 
 **Rationale**:
 - Simplifies workshop experience
-- Sufficient security for temporary lab resources
-- Managed identities add complexity for beginners
+- Demonstrates Azure security best practices
+- No credential management required
 
-**Future enhancement**: Add optional managed identity configuration
+**Security measures**:
+- Logic Apps use system-assigned managed identities
+- Participants configure connectors via Portal (guided experience)
+- All traffic encrypted in transit
 
 ### 7. Resource Naming Convention
-**Decision**: Azure naming conventions with environment prefix
+**Decision**: Azure naming conventions with consistent project identifier
 
 **Pattern**:
 ```
-{resource-type}-{environment}-{purpose}
-law-devlab-monitor        # Log Analytics Workspace
-appi-devlab-monitor       # Application Insights
-func-devlab-monitor       # Function App
-sb-devlab-monitor         # Service Bus
-st{env}{unique}           # Storage (max 24 chars, no hyphens)
+{resource-type}-azmonlab-{environment}
+law-azmonlab-dev          # Log Analytics Workspace
+appi-azmonlab-dev         # Application Insights
+logic-azmonlab-sbsender   # Logic App - Service Bus Sender
+logic-azmonlab-apicaller  # Logic App - API Caller
+sb-azmonlab-dev           # Service Bus
+apim-azmonlab-dev         # API Management
+stazmon{env}{unique8}     # Storage (18 chars total, no hyphens)
 ```
 
 **Rationale**:
@@ -248,29 +246,35 @@ st{env}{unique}           # Storage (max 24 chars, no hyphens)
 ## Data Flow
 
 ```
-┌─────────────────┐
-│  Function App   │──┐
-│  (Python 3.11)  │  │
-└─────────────────┘  │
-                     │  Telemetry
-┌─────────────────┐  │  (traces, metrics,
-│   API Gateway   │──┤   exceptions, deps)
-│      (APIM)     │  │
-└─────────────────┘  │
-                     ▼
-┌─────────────────┐  ┌──────────────────┐
-│  Service Bus    │  │ App Insights     │
-│  (Messages)     │  │ (APM data)       │
-└─────────────────┘  └──────────────────┘
-         │                    │
-         │                    │ Linked
-         ▼                    ▼
+┌─────────────────┐      ┌─────────────────┐
+│  Logic App      │      │  Logic App      │
+│  (SB Sender)    │      │  (API Caller)   │
+└─────────────────┘      └─────────────────┘
+         │                        │
+         │ Messages               │ HTTP Requests
+         ▼                        ▼
+┌─────────────────┐      ┌─────────────────┐
+│  Service Bus    │      │   API Gateway   │
+│  (Queue/Topic)  │      │      (APIM)     │
+└─────────────────┘      └─────────────────┘
+         │                        │
+         │                        │
+         │  Diagnostic Logs       │
+         └────────┬───────────────┘
+                  ▼
     ┌─────────────────────────────────┐
     │   Log Analytics Workspace       │
     │   (Centralized Logs & Metrics)  │
     └─────────────────────────────────┘
-                     │
-                     ▼
+                  │         ▲
+                  │         │
+                  ▼         │ Linked
+         ┌────────────────────┐
+         │  App Insights      │
+         │  (APIM logging)    │
+         └────────────────────┘
+                  │
+                  ▼
          ┌───────────────────────┐
          │  KQL Queries          │
          │  Alerts               │
@@ -286,8 +290,8 @@ st{env}{unique}           # Storage (max 24 chars, no hyphens)
 3. **Validation**: Script validates environment variables
 4. **Resource Group**: Created (if `CREATE_RESOURCE_GROUP=true`) or verified
 5. **Infrastructure**: Bicep deployment to resource group
-6. **Outputs**: Connection strings and resource IDs saved to `deployment-outputs.json`
-7. **Next Steps**: User deploys Function App code and follows lab guide
+6. **Outputs**: Resource IDs and connection details saved to `deployment-outputs.json`
+7. **Next Steps**: User follows lab guide to configure Logic App workflows and APIM APIs
 
 ## Cost Estimate
 
@@ -298,17 +302,16 @@ Estimated daily cost (East US region):
 | Log Analytics | PerGB2018, ~1GB/day | $2.76 |
 | Application Insights | Workspace-based | Included |
 | Storage Account | Standard_LRS, minimal | $0.05 |
-| Function App | Consumption, 100K executions | $0.20 |
 | Service Bus | Standard | $0.35 |
-| Logic Apps | Consumption, 100 runs | $0.01 |
-| API Management | Consumption, 10K calls | $0.04 |
-| **Total** | | **~$3.41/day** |
+| Logic Apps (2x) | Consumption, 100 runs each | $0.02 |
+| API Management | Developer | $1.65 |
+| **Total** | | **~$4.83/day** |
 
 **Notes**:
 - Costs vary based on usage and region
 - Log Analytics dominates cost (ingestion + retention)
-- Consumption tiers minimize idle costs
-- Workshop duration: 6 hours (~$0.85 per participant)
+- Developer tier APIM has fixed daily cost
+- Workshop duration: 6 hours (~$1.21 per participant)
 
 ## Security Considerations
 

@@ -1,5 +1,6 @@
 // API Management module
-// Provides API gateway with Application Insights integration
+// Provides base API gateway with Application Insights integration
+// Participants will configure APIs as part of lab exercises
 
 @description('The name of the API Management instance')
 param apimName string
@@ -105,4 +106,4 @@ output apimName string = apiManagement.name
 output apimGatewayUrl string = apiManagement.properties.gatewayUrl
 
 @description('The portal URL of the API Management service')
-output apimPortalUrl string = apiManagement.properties.portalUrl
+output apimPortalUrl string = (sku == 'Consumption' || apiManagement.properties.portalUrl == null) ? '' : apiManagement.properties.portalUrl
