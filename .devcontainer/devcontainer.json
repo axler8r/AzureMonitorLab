@@ -34,19 +34,14 @@
             "extensions": [
                 "GitHub.copilot",
                 "donjayamanne.kusto",
-                "humao.rest-client",
                 "bierner.markdown-mermaid",
-                "ms-azuretools.azure-dev",
                 "ms-azuretools.vscode-apimanagement",
                 "ms-azuretools.vscode-azure-github-copilot",
                 "ms-azuretools.vscode-azurecli",
-                "ms-azuretools.vscode-azurefunctions",
                 "ms-azuretools.vscode-azureresourcegroups",
                 "ms-azuretools.vscode-azurestorage",
                 "ms-azuretools.vscode-bicep",
                 "ms-azuretools.vscode-logicapps",
-                "ms-python.python",
-                "ms-python.vscode-pylance",
                 "ms-vscode.powershell",
                 "redhat.vscode-yaml"
             ]
