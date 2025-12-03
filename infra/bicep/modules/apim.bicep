@@ -1,5 +1,6 @@
 // API Management module
-// Provides API gateway with Application Insights integration
+// Provides base API gateway with Application Insights integration
+// Participants will configure APIs as part of lab exercises
 
 @description('The name of the API Management instance')
 param apimName string

@@ -9,5 +9,5 @@ param logAnalyticsRetentionDays = 30
 param publisherEmail = 'placeholder@example.com'
 param publisherName = 'Placeholder'
 
-// Logic App telemetry generation interval (30 seconds for fast demo feedback)
-param recurrenceIntervalSeconds = 30
+// Logic App recurrence interval (60 seconds default for both workflows)
+param recurrenceIntervalSeconds = 60
