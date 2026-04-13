@@ -17,7 +17,7 @@
         "ghcr.io/devcontainers/features/azure-cli:1": {
             "installBicep": "true"
         },
-        "ghcr.io/devcontainers/features/powershell:1": {
+        "ghcr.io/devcontainers/features/powershell:2": {
             "version": "7.4"
         },
         "ghcr.io/devcontainers/features/python:1": {
